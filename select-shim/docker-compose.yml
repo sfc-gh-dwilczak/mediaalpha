@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  shim:
+    platform: linux/amd64
+    build: ./perl
+    environment:
+      CORE_DSN: ${CORE_DSN}
+      CORE_USER: ${CORE_USER}
+      CORE_PASS: ${CORE_PASS}
+      SF_DSN: ${SF_DSN}
+      SF_USER: ${SF_USER}
+      SF_PASS: ${SF_PASS}
+      ROUTE_DAYS: ${ROUTE_DAYS}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
