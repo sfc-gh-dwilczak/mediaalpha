@@ -1,13 +1,28 @@
 # SELECT Routing Shim
 
-A Perl query routing shim that directs `SELECT` statements to **MySQL** (recent data) or **Snowflake** (archived data) based on date range.
+A Perl query routing shim with a web UI that sits between your application and two databases. It inspects the `created_at` date range in a `SELECT` statement and routes the query to **MySQL** for recent data or **Snowflake** for archived data based on a configurable cutoff.
 
-## How It Works
+## Examples
 
-A cutoff date is computed as today minus `ROUTE_DAYS` (default 365). The `BETWEEN` start date in your query decides the target:
+### MySQL (recent data)
 
-- **Start date >= cutoff** &rarr; MySQL
-- **Start date < cutoff** &rarr; Snowflake
+```sql
+SELECT id, created_at, customer, amount
+FROM orders
+WHERE created_at BETWEEN '2025-07-01' AND '2026-03-01';
+```
+
+![MySQL output](images/mysql.png)
+
+### Snowflake (archived data)
+
+```sql
+SELECT id, created_at, customer, amount
+FROM orders
+WHERE created_at BETWEEN '2023-01-01' AND '2024-12-31';
+```
+
+![Snowflake output](images/snowflake.png)
 
 ## Setup
 
@@ -47,29 +62,7 @@ docker compose up --build
 
 Open **http://localhost:3000**
 
-## Example Queries
-
-### MySQL (recent data)
-
-```sql
-SELECT id, created_at, customer, amount
-FROM orders
-WHERE created_at BETWEEN '2025-07-01' AND '2026-03-01';
-```
-
-![MySQL output](images/mysql.png)
-
-### Snowflake (archived data)
-
-```sql
-SELECT id, created_at, customer, amount
-FROM orders
-WHERE created_at BETWEEN '2023-01-01' AND '2024-12-31';
-```
-
-![Snowflake output](images/snowflake.png)
-
-## Stopping
+### Stopping
 
 ```bash
 docker compose down
